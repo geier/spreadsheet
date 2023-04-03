@@ -6,14 +6,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="spread",
     version="0.0.1",
-    author="Example Author",
-    author_email="author@example.com",
-    description="A small example package",
+    author="Christian Geier",
+    author_email="github@lostpackets.de",
+    description="Bringing Excel-style formulas to plain text tables",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/geier/spread",
     project_urls={
-        "Bug Tracker": "https://github.com/pypa/sampleproject/issues",
+        "Bug Tracker": "https://github.com/geier/spread/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -22,5 +22,7 @@ setuptools.setup(
     ],
     package_dir={"spread": "spread"},
     packages=setuptools.find_packages(where="spread"),
-    python_requires=">=3.6",
+    python_requires=">=3.9",
+    install_requires=["sly"],
+    test_requires=["pytest"],
 )

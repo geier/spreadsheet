@@ -1,12 +1,15 @@
 from sly import Lexer, Parser
 
 class CalcLexer(Lexer):
-    tokens = { CELL, NUMBER, }
+    tokens = { CELL, NUMBER, RANGE, SUM, AVG}
     ignore = ' \t'
-    literals = { '=', '+', '-', '*', '/', '(', ')' }
+    literals = { '=', '+', '-', '*', '/', '(', ')', ':'}
 
-    # Tokens
+    # Tokens (order matters!)
+    RANGE = r'[A-Z][0-9]\:[A-Z][0-9]'
     CELL = r'[A-Z]{1,2}[0-9]+'
+    SUM = "SUM"
+    AVG = "AVG"
 
     @_(r'\d+')
     def NUMBER(self, t):
@@ -69,8 +72,18 @@ class CalcParser(Parser):
 
     @_('CELL')
     def expr(self, p):
-        cellname = p[0]
-        return self._table[cellname].value
+        return self._table[p.CELL].value
+
+    @_('SUM "(" RANGE ")"')
+    def expr(self, p):
+        return sum(cell.value for cell in self._table.get_cell_range(p.RANGE))
+
+    @_('AVG "(" RANGE ")"')
+    def expr(self, p):
+        cells = self._table.get_cell_range(p.RANGE)
+        print(len(cells))
+        print(cells)
+        return sum(cell.value for cell in cells) / len(cells)
 
 
 class Evaluator:

@@ -1,3 +1,4 @@
+from .helper import cellname_to_indices, range_to_cells
 from typing import List, Tuple
 from .evaluate import Evaluator
 
@@ -5,20 +6,6 @@ INT = 'int'
 FLOAT = 'float'
 STRING = 'string'
 FORMULA = 'formula'
-
-
-def cellname_to_indices(cellname: str) -> Tuple[int, int]:
-    column_labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    column_name = cellname.strip('01234567890')
-    row_name = cellname.strip(column_labels)
-    row_index = int(row_name) - 1
-
-    column_index = 0
-    for index in range(len(column_name)):
-        column_index *= len(column_labels)**index
-        column_index += ord(column_name[index]) - 64
-    column_index -= 1
-    return column_index, row_index
 
 
 class Cell:
@@ -50,7 +37,6 @@ class Cell:
             self.dtype = STRING
             break
 
-
     def __str__(self):
         return '<Cell: {}>'.format(self.value)
 
@@ -67,6 +53,18 @@ class Table:
             for cell in row:
                 if cell.dtype == FORMULA:
                     cell.value = self.evaluate(cell._raw[1:])
+
+
+    def get_cell_range(self, rangestr: str) -> List[Cell]:
+        assert isinstance(rangestr, str)
+        assert ':' in rangestr
+
+        cell_indices = range_to_cells(*rangestr.split(':'))
+        try:
+            rval = [self._cells[row_i][column_i] for column_i, row_i in cell_indices]
+        except IndexError:
+            raise IndexError(f'range {rangestr} out of range')
+        return rval
 
     def __getitem__(self, cellname):
         assert isinstance(cellname, str)
